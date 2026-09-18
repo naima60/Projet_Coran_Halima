@@ -10,14 +10,15 @@ import {
   Heart,
   Share2,
 } from 'lucide-react';
-import { Surah, Reciter, UserProgress, Riwayah } from './types';
+import { Surah, Reciter, UserProgress, Riwayah, AppTabType } from './types';
 import { SURAHS_LIST, RECITERS, getRecitersByRiwayah, getSurahWithAyahs } from './data/quranData';
 import { Header } from './components/Header';
 import { ProgressiveReader } from './components/ProgressiveReader';
 import { LiveRecitationTester } from './components/LiveRecitationTester';
 import { MemorizationStudio } from './components/MemorizationStudio';
 import { VocabularyPanel } from './components/VocabularyPanel';
-import { ProgressAndReminders } from './components/ProgressAndReminders';
+import { AdhkarAndDuas } from './components/AdhkarAndDuas';
+import { PrayerTimesPanel } from './components/PrayerTimesPanel';
 import { WordMeaningModal } from './components/WordMeaningModal';
 import { soundManager } from './utils/soundEffects';
 
@@ -55,7 +56,7 @@ const INITIAL_PROGRESS: UserProgress = {
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'reader' | 'live-recitation' | 'memorization-studio' | 'vocabulary' | 'progress'>('reader');
+  const [activeTab, setActiveTab] = useState<AppTabType>('reader');
   const [selectedRiwayah, setSelectedRiwayah] = useState<Riwayah>(() => {
     try {
       const stored = localStorage.getItem('ratel_selected_riwayah');
@@ -301,19 +302,12 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'progress' && (
-                <ProgressAndReminders
-                  progress={userProgress}
-                  onUpdateGoal={(newGoal) => {
-                    setUserProgress((p) => ({ ...p, dailyGoalVerses: newGoal }));
-                  }}
-                  onUpdateLevel={(newLevel) => {
-                    setUserProgress((p) => ({ ...p, level: newLevel }));
-                  }}
-                  onUpdateReminders={(newSettings) => {
-                    setUserProgress((p) => ({ ...p, reminderSettings: newSettings }));
-                  }}
-                />
+              {activeTab === 'adhkar' && (
+                <AdhkarAndDuas />
+              )}
+
+              {activeTab === 'prayer-times' && (
+                <PrayerTimesPanel />
               )}
             </motion.div>
           </AnimatePresence>
@@ -334,14 +328,13 @@ export default function App() {
 
       {/* App Footer */}
       <footer className="border-t border-[#EADBCE] bg-[#F7F4EB] py-6 mt-12 text-center text-xs text-[#6B6358] space-y-2">
-        <div className="flex items-center justify-center gap-2">
-          <span className="font-bold text-[#2D5A27] font-quran text-base">
-            منصة حليمة لتعلم و حفظ القرآن الكريم
-          </span>
-          <span className="text-[#C5A059]">•</span>
-          <span className="font-serif-art font-semibold text-[#4A453E]">قال رسول الله ﷺ: «خَيْرُكُمْ مَنْ تَعَلَّمَ القُرْآنَ وَعَلَّمَهُ»</span>
-        </div>
-        <p className="text-[#877E72]">
+        <h3 className="font-bold text-[#2D5A27] font-quran text-base sm:text-lg">
+          منصة حليمة لتعلم و حفظ القرآن الكريم
+        </h3>
+        <p className="font-serif-art text-sm sm:text-base text-[#8A5800] font-semibold">
+          « رَّبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا »
+        </p>
+        <p className="text-[#877E72] text-[11px] sm:text-xs">
           مصحف إلكتروني بروايتي حفص وورش مع الاستماع الصوتي المعتمد والمصحح الذكي الفوري
         </p>
       </footer>

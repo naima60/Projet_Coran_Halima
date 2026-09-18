@@ -1,5 +1,13 @@
 export type Riwayah = 'hafs' | 'warsh';
 
+export type AppTabType = 
+  | 'reader' 
+  | 'live-recitation' 
+  | 'memorization-studio' 
+  | 'vocabulary' 
+  | 'adhkar' 
+  | 'prayer-times';
+
 export type ReadingLayoutMode = 'continuous-page' | 'accumulative-page' | 'cards' | 'ayah-focus';
 
 export interface AyahWord {

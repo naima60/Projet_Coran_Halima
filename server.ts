@@ -395,6 +395,8 @@ app.post("/api/gemini/generate-quiz", async (req, res) => {
 
 // Vite middleware & Static serving
 async function setupVite() {
+  app.use(express.static(path.resolve(process.cwd(), "public")));
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

@@ -4,18 +4,20 @@ import {
   Mic,
   Brain,
   BookMarked,
-  TrendingUp,
+  Sparkles,
+  Clock,
   Search,
   ChevronDown,
-  Sparkles,
+  X,
+  Heart,
 } from 'lucide-react';
-import { Surah, UserProgress, Riwayah, Reciter } from '../types';
+import { Surah, UserProgress, Riwayah, Reciter, AppTabType } from '../types';
 import { SURAHS_LIST, getRecitersByRiwayah, RECITERS } from '../data/quranData';
 import { soundManager } from '../utils/soundEffects';
 
 interface HeaderProps {
-  activeTab: 'reader' | 'live-recitation' | 'memorization-studio' | 'vocabulary' | 'progress';
-  onSelectTab: (tab: 'reader' | 'live-recitation' | 'memorization-studio' | 'vocabulary' | 'progress') => void;
+  activeTab: AppTabType;
+  onSelectTab: (tab: AppTabType) => void;
   currentSurah: Surah;
   onSelectSurah: (surahNumber: number) => void;
   progress: UserProgress;
@@ -38,6 +40,14 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [surahDropdownOpen, setSurahDropdownOpen] = useState(false);
   const [surahSearch, setSurahSearch] = useState('');
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [photoSrc, setPhotoSrc] = useState<string>(() => {
+    try {
+      return localStorage.getItem('halima_photo') || '/maman.jpg';
+    } catch {
+      return '/maman.jpg';
+    }
+  });
 
   const recitersForRiwayah = getRecitersByRiwayah(selectedRiwayah);
 
@@ -49,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
   );
 
   interface TabItem {
-    id: 'reader' | 'live-recitation' | 'memorization-studio' | 'vocabulary' | 'progress';
+    id: AppTabType;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
   }
@@ -59,16 +69,34 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'live-recitation', label: 'تسجيل التلاوة و الاستماع', icon: Mic },
     { id: 'memorization-studio', label: 'التدرب على الحفظ', icon: Brain },
     { id: 'vocabulary', label: 'تفسير الكلمات الصعبة', icon: BookMarked },
-    { id: 'progress', label: 'التقدم والتذكيرات', icon: TrendingUp },
+    { id: 'adhkar', label: 'أذكار الصباح والمساء والأدعية', icon: Sparkles },
+    { id: 'prayer-times', label: 'مواقيت الصلاة', icon: Clock },
   ];
 
   return (
     <header className="sticky top-0 z-50 bg-[#FAF7F0] border-b border-[#D4AF37]/40 shadow-sm backdrop-blur-md">
       <div className="max-w-4xl mx-auto px-3 sm:px-6 py-2.5 space-y-2.5">
         
-        {/* 1. Main Title Banner (منصة حليمة لتعلم و حفظ القرآن الكريم) */}
-        <div className="w-full bg-[#FAF7F0] border-2 border-[#2D5A27]/80 rounded-2xl py-2 px-3 text-center shadow-xs">
-          <h1 className="text-base sm:text-xl font-bold font-quran text-[#2D5A27] tracking-wide">
+        {/* 1. Main Title Banner (منصة حليمة لتعلم و حفظ القرآن الكريم) with Photo on the left */}
+        <div className="relative w-full bg-[#FAF7F0] border-2 border-[#2D5A27]/80 rounded-2xl py-2 px-3 text-center shadow-xs flex items-center justify-center min-h-[54px] sm:min-h-[58px]">
+          {/* Photo on the physical LEFT - vertically centered and aligned */}
+          <div className="absolute left-2.5 sm:left-3.5 top-1/2 -translate-y-1/2 flex items-center z-10">
+            <button
+              onClick={() => setIsPhotoModalOpen(true)}
+              className="p-0.5 rounded-full hover:scale-105 active:scale-95 transition-transform focus:outline-hidden"
+              title="يحياوي حليمة (1935 - 2026)"
+            >
+              <img
+                src={photoSrc}
+                alt="يحياوي حليمة (1935 - 2026)"
+                referrerPolicy="no-referrer"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover object-top border-2 border-[#D4AF37] shadow-sm ring-2 ring-[#2D5A27]/30 hover:ring-[#D4AF37] transition-all"
+              />
+            </button>
+          </div>
+
+          {/* Center: Title */}
+          <h1 className="text-sm sm:text-lg md:text-xl font-bold font-quran text-[#2D5A27] tracking-wide px-12 sm:px-14 text-center">
             منصة حليمة لتعلم و حفظ القرآن الكريم
           </h1>
         </div>
@@ -211,7 +239,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          <div className="flex-1 grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5">
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 xl:flex xl:flex-wrap gap-1.5">
             {navTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -238,6 +266,50 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
       </div>
+
+      {/* Photo Modal / Lightbox */}
+      {isPhotoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FFFDF9] border-2 border-[#D4AF37] rounded-3xl max-w-sm w-full p-5 text-center shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setIsPhotoModalOpen(false)}
+              className="absolute top-3 left-3 p-1.5 rounded-full text-[#6B6358] hover:bg-[#F2ECE0] transition-colors"
+              title="إغلاق"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="relative mx-auto w-44 h-44 sm:w-52 sm:h-52 rounded-full overflow-hidden border-4 border-[#D4AF37] shadow-lg mb-3 ring-4 ring-[#2D5A27]/20">
+              <img
+                src={photoSrc}
+                alt="يحياوي حليمة (1935 - 2026)"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-[#2D5A27] font-quran tracking-normal mb-1">
+              يحياوي حليمة
+            </h3>
+            <p className="text-sm sm:text-base text-[#8A5800] font-semibold font-sans mb-2" dir="ltr">
+              (1935 - 2026)
+            </p>
+
+            <p className="font-serif-art text-sm sm:text-base text-[#8A5800] my-3 leading-relaxed">
+              « رَّبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا »
+            </p>
+
+            <div className="pt-3 border-t border-[#EADBCE] flex justify-center">
+              <button
+                onClick={() => setIsPhotoModalOpen(false)}
+                className="px-6 py-2 bg-[#2D5A27] text-white rounded-xl font-bold hover:bg-[#23471f] transition-colors text-sm shadow-xs"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

@@ -2,7 +2,8 @@
   "name": "Remix منصة نعيمة لتعلم وحفظ القرآن الكريم",
   "description": "منصة حليمة الذكية لتعلم وحفظ القرآن الكريم لجميع الأعمار بروايتي حفص وورش مع الاستماع لكبار القراء وتسجيل التلاوة وتفسير الكلمات.",
   "requestFramePermissions": [
-    "microphone"
+    "microphone",
+    "geolocation"
   ],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
